@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axis Radio</title>
+    <link rel="icon" href="static/axis.png">
+    <meta name="theme-color" content="#1A5CC1">
+    <meta name="description" content="Your favorite radio station">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1A5CC1;
+            --accent-color: #CB6CE6;
+            --text-color: #ffffff;
+            --bg-color: #1A5CC1;
+            --nav-bg: #ffffff;
+            --circle-color: rgba(203, 108, 230, 0.4);
+        }
+
+        .dark-mode {
+            --primary-color: #1A2C4D;
+            --bg-color: #1A2C4D;
+            --text-color: #f0f0f0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .visible {
+            display: flex;
+            opacity: 1;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #home {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background-color: var(--circle-color);
+            box-shadow: 0 0 20px rgba(203, 108, 230, 0.6);
+            z-index: 1;
+            animation: float 12s ease-in-out infinite;
+            transition: all 1s ease;
+        }
+
+        .home-circle1 { width: 140px; height: 140px; top: 10%; left: 10%; animation-delay: 0s; }
+        .home-circle2 { width: 200px; height: 200px; top: 60%; left: 70%; animation-delay: 4s; }
+        .home-circle3 { width: 160px; height: 160px; bottom: 15%; left: 25%; animation-delay: 8s; }
+        .chat-circle1 { width: 180px; height: 180px; top: 15%; right: 10%; animation-delay: 1s; }
+        .chat-circle2 { width: 140px; height: 140px; bottom: 20%; left: 15%; animation-delay: 5s; }
+        .chat-circle3 { width: 160px; height: 160px; top: 65%; right: 20%; animation-delay: 3s; }
+        .settings-circle1 { width: 150px; height: 150px; top: 25%; left: 10%; animation-delay: 2s; }
+        .settings-circle2 { width: 190px; height: 190px; bottom: 25%; right: 15%; animation-delay: 6s; }
+        .settings-circle3 { width: 120px; height: 120px; top: 15%; right: 10%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-10px, -15px) rotate(-2deg); }
+            50% { transform: translate(5px, 10px) rotate(2deg); }
+            75% { transform: translate(10px, -5px) rotate(-1deg); }
+        }
+
+        .logo-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .listen-live {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .listen-live.playing {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+        }
+
+        .vibrate {
+            animation: vibrate 0.3s linear;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        .profile-header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            background-image: url('static/profile.jpeg');
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: all 0.3s ease;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+
+        .slogan {
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 200px;
+            display: none;
+            z-index: 101;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .profile-menu-item {
+            padding: 8px 0;
+            cursor: pointer;
+            color: #666;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        .profile-menu-item:hover {
+            color: var(--accent-color);
+        }
+
+        .coming-soon-badge {
+            background-color: rgba(203, 108, 230, 0.2);
+            color: var(--accent-color);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            border: 1px solid var(--accent-color);
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: var(--nav-bg);
+            border-radius: 25px 25px 0 0;
+            display: flex;
+            justify-content: center;
+            padding: 15px 0 25px;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .nav-items-container {
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 25px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .nav-item .material-icons {
+            font-size: 24px;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: var(--accent-color);
+        }
+
+        .nav-item.active .material-icons {
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .nav-selection-indicator {
+            position: absolute;
+            bottom: 10px;
+            height: 50px;
+            width: 95px;
+            background-color: rgba(203, 108, 230, 0.2);
+            border-radius: 14px;
+            border: 2px solid var(--accent-color);
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        #chat {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-content {
+            text-align: center;
+            color: white;
+            z-index: 10;
+            max-width: 80%;
+            padding: 20px;
+        }
+
+        .chat-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .chat-content p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        #settings {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .settings-content {
+            text-align: center;
+            color: white;
+            z-index: 10;
+            max-width: 80%;
+            padding: 20px;
+        }
+
+        .settings-title {
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .setting-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .setting-label {
+            font-size: 1.1rem;
+            text-align: left;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .offline-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff4444;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .install-prompt {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .install-prompt-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .install-prompt button {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .install-prompt button:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes slideUp {
+            from { bottom: -50px; opacity: 0; }
+            to { bottom: 100px; opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .listen-live {
+                padding: 15px 30px;
+                font-size: 1.2rem;
+            }
+
+            .logo-container {
+                margin-bottom: 30px;
+            }
+
+            .circle {
+                width: 100px !important;
+                height: 100px !important;
+            }
+
+            .home-circle2, .chat-circle2, .settings-circle3 { 
+                width: 150px !important;
+                height: 150px !important;
+            }
+
+            .home-circle3, .chat-circle3, .settings-circle2 { 
+                width: 120px !important;
+                height: 120px !important;
+            }
+
+            .nav-item {
+                font-size: 0.75rem;
+                padding: 8px 15px;
+                min-width: 70px;
+            }
+
+            .nav-item .material-icons {
+                font-size: 22px;
+            }
+
+            .nav-selection-indicator {
+                height: 45px;
+                width: 90px;
+                bottom: 8px;
+                border-radius: 12px;
+            }
+
+            .settings-content, .chat-content {
+                max-width: 90%;
+            }
+
+            .offline-notification,
+            .install-prompt {
+                width: 90%;
+                text-align: center;
+                padding: 12px 15px;
+            }
+
+            .install-prompt-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .install-prompt button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Page -->
+    <div id="home" class="visible">
+        <div class="profile-header">
+            <div class="profile-container">
+                <div class="profile-pic" id="profilePic" onclick="toggleProfileDropdown()"></div>
+                <div class="slogan">Your sound, Your station!</div>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-menu-item" id="loginBtn" onclick="showComingSoon()">
+                    Login <span class="coming-soon-badge">SOON</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="logo-container">
+            <img src="static/IMG_7016.png" alt="Axis Radio Logo" style="width: 150px;">
+        </div>
+
+        <button class="listen-live" id="listenButton" onclick="toggleAudio()">Listen Live</button>
+
+        <div class="circle home-circle1"></div>
+        <div class="circle home-circle2"></div>
+        <div class="circle home-circle3"></div>
+    </div>
+
+    <!-- Chat Page -->
+    <div id="chat" class="hidden">
+        <div class="chat-content">
+            <h2>Chat Feature</h2>
+            <p>We're working hard to bring you an amazing chat experience where you can connect with other listeners.</p>
+            <div class="soon-badge" style="margin: 20px auto; display: inline-block;">COMING SOON</div>
+        </div>
+
+        <div class="circle chat-circle1"></div>
+        <div class="circle chat-circle2"></div>
+        <div class="circle chat-circle3"></div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settings" class="hidden">
+        <div class="settings-content">
+            <h2 class="settings-title">Settings</h2>
+
+            <div class="setting-option">
+                <span class="setting-label">Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-option">
+                <span class="setting-label">Notifications</span>
+                <label class="switch">
+                    <input type="checkbox" id="notificationsToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="circle settings-circle1"></div>
+        <div class="circle settings-circle2"></div>
+        <div class="circle settings-circle3"></div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="offline-notification" id="offlineNotification">
+        You're currently offline. Some features may not work.
+    </div>
+
+    <div class="install-prompt" id="installPrompt">
+        Install Axis Radio for better experience
+        <div class="install-prompt-buttons">
+            <button id="installButton">Install</button>
+            <button id="dismissInstall">Not Now</button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="nav-items-container">
+            <div class="nav-selection-indicator" id="selectionIndicator"></div>
+            <a href="#" class="nav-item active" id="homeNav" onclick="navigate('home')">
+                <span class="material-icons">home</span>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item" id="chatNav" onclick="navigate('chat')">
+                <span class="material-icons">chat_bubble</span>
+                <span>Chat</span>
+            </a>
+            <a href="#" class="nav-item" id="settingsNav" onclick="navigate('settings')">
+                <span class="material-icons">settings</span>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Background Audio -->
+    <audio id="backgroundAudio" crossorigin="anonymous">
+        <source src="https://dancewave.online/retrodance.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // DOM Elements
+        const listenButton = document.getElementById('listenButton');
+        const backgroundAudio = document.getElementById('backgroundAudio');
+        const profilePic = document.getElementById('profilePic');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const selectionIndicator = document.getElementById('selectionIndicator');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        const offlineNotification = document.getElementById('offlineNotification');
+        const installPrompt = document.getElementById('installPrompt');
+        const installButton = document.getElementById('installButton');
+        const dismissInstall = document.getElementById('dismissInstall');
+
+        // App State
+        let isPlaying = false;
+        let currentPage = 'home';
+        let deferredPrompt;
+
+        // Initialize selection indicator
+        function initSelectionIndicator() {
+            const activeNav = document.querySelector('.nav-item.active');
+            if (activeNav) {
+                updateSelectionIndicator(activeNav);
+            }
+        }
+
+        // Position the indicator
+        function updateSelectionIndicator(activeNav) {
+            const navRect = activeNav.getBoundingClientRect();
+            const containerRect = document.querySelector('.nav-items-container').getBoundingClientRect();
+
+            const indicatorWidth = 95;
+            const centerOffset = (navRect.width - indicatorWidth) / 2;
+            const leftPosition = navRect.left - containerRect.left + centerOffset;
+
+            selectionIndicator.style.width = `${indicatorWidth}px`;
+            selectionIndicator.style.left = `${leftPosition}px`;
+        }
+
+        // Audio Control with Vibration
+        function toggleAudio() {
+            vibrate();
+            if (isPlaying) {
+                backgroundAudio.pause();
+                isPlaying = false;
+            } else {
+                backgroundAudio.play()
+                    .then(() => isPlaying = true)
+                    .catch(error => {
+                        console.error('Playback failed:', error);
+                        // Fallback for autoplay restrictions
+                        listenButton.textContent = "Tap to Play";
+                        alert("Please tap the button again to start playback");
+                        isPlaying = false;
+                    });
+            }
+            updatePlayButton();
+        }
+
+        function updatePlayButton() {
+            listenButton.textContent = isPlaying ? 'Stop' : 'Listen Live';
+            listenButton.classList.toggle('playing', isPlaying);
+        }
+
+        // Vibration Feedback
+        function vibrate() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+            }
+            listenButton.classList.add('vibrate');
+            setTimeout(() => listenButton.classList.remove('vibrate'), 300);
+        }
+
+        // Profile Management
+        function toggleProfileDropdown() {
+            vibrate();
+            profileDropdown.classList.toggle('show');
+        }
+
+        function showComingSoon() {
+            vibrate();
+            alert("This feature is coming soon!");
+            toggleProfileDropdown();
+        }
+
+        // Dark/Light Mode
+        function toggleDarkMode() {
+            vibrate();
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', darkModeToggle.checked);
+        }
+
+        // Navigation
+        function navigate(page) {
+            vibrate();
+            if (page === currentPage) return;
+
+            const allPages = ['home', 'chat', 'settings'];
+            const navItems = {
+                home: document.getElementById('homeNav'),
+                chat: document.getElementById('chatNav'),
+                settings: document.getElementById('settingsNav'),
+            };
+
+            currentPage = page;
+
+            allPages.forEach(p => {
+                const element = document.getElementById(p);
+                if (p === page) {
+                    element.classList.remove('hidden');
+                    element.classList.add('visible');
+                    navItems[p].classList.add('active');
+                    updateSelectionIndicator(navItems[p]);
+                } else {
+                    element.classList.remove('visible');
+                    element.classList.add('hidden');
+                    navItems[p].classList.remove('active');
+                }
+            });
+        }
+
+        // Offline Detection
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                offlineNotification.style.display = 'none';
+            } else {
+                offlineNotification.style.display = 'block';
+                setTimeout(() => {
+                    offlineNotification.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Install Prompt
+        function setupInstallPrompt() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                setTimeout(() => {
+                    installPrompt.style.display = 'flex';
+                }, 3000);
+            });
+
+            installButton.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('User accepted install');
+                    }
+                    deferredPrompt = null;
+                    installPrompt.style.display = 'none';
+                }
+            });
+
+            dismissInstall.addEventListener('click', () => {
+                installPrompt.style.display = 'none';
+            });
+        }
+
+        // Service Worker Registration
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.profile-container') && !event.target.closest('.profile-dropdown')) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('darkMode') === 'true') {
+                body.classList.add('dark-mode');
+                darkModeToggle.checked = true;
+            }
+
+            initSelectionIndicator();
+            navigate('home');
+            updateOnlineStatus();
+            setupInstallPrompt();
+            registerServiceWorker();
+
+            // Fix for iOS audio playback
+            document.addEventListener('touchstart', function() {}, false);
+        });
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        window.addEventListener('resize', initSelectionIndicator);
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isPlaying) {
+                // Pause audio when tab is backgrounded to save resources
+                backgroundAudio.pause();
+                isPlaying = false;
+                updatePlayButton();
+            }
+        });
+    </script>
+
+    <!-- Service Worker Script (embedded) -->
+    <script id="sw-script">
+        // Register service worker inline
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (event) => {
+                    event.waitUntil(
+                        caches.open('axis-radio-v1').then((cache) => {
+                            return cache.addAll([
+                                '/',
+                                '/index.html',
+                                'static/axis.png',
+                                'static/IMG_7016.png',
+                                'static/profile.jpeg',
+                                'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap',
+                                'https://fonts.googleapis.com/icon?family=Material+Icons'
+                            ]);
+                        })
+                    );
+                });
+
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request).then((response) => {
+                            return response || fetch(event.request);
+                        })
+                    );
+                });
+            `;
+
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+
+            navigator.serviceWorker.register(swUrl)
+                .then(registration => console.log('SW Registered'))
+                .catch(err => console.log('SW Registration failed: ', err));
+        }
+    </script>
+
+    <!-- Inline Manifest (fallback) -->
+    <script type="application/manifest+json" id="manifest-fallback">
+        {
+            "name": "Axis Radio",
+            "short_name": "AxisRadio",
+            "description": "Your favorite radio station",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#1A5CC1",
+            "theme_color": "#1A5CC1",
+            "icons": [
+                {
+                    "src": "static/axis.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "static/axis.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        }
+    </script>
+</body>
+</html>
